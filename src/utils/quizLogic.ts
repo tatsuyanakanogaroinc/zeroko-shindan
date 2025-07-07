@@ -1,7 +1,8 @@
-import { GrowthType, QuizScores } from '../types/quiz';
+import { QuizScores } from '../types/quiz';
 import { quizResults } from '../data/quizData';
+import { QuizQuestion } from '../types/quiz';
 
-export const calculateScores = (answers: { questionId: number; selectedOption: number }[], questions: any[]): QuizScores => {
+export const calculateScores = (answers: { questionId: number; selectedOption: number }[], questions: QuizQuestion[]): QuizScores => {
   const scores: QuizScores = {
     自発型: 0,
     転機型: 0,
