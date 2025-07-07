@@ -1,0 +1,7 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="55" fill="#f04dff" stroke="#fff" stroke-width="6"/>
+  <rect x="45" y="40" width="30" height="40" rx="15" fill="#fff"/>
+  <circle cx="60" cy="60" r="12" fill="#f04dff"/>
+  <rect x="55" y="80" width="10" height="20" rx="5" fill="#fff"/>
+  <text x="60" y="115" text-anchor="middle" font-size="18" fill="#fff" font-weight="bold">🔥</text>
+</svg> 
