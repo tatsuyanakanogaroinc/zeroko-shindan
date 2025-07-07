@@ -1,6 +1,17 @@
 <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="60" cy="60" r="55" fill="#a855f7" stroke="#fff" stroke-width="6"/>
-  <ellipse cx="60" cy="70" rx="18" ry="25" fill="#fff"/>
-  <path d="M70 60 Q60 40 50 60" stroke="#a855f7" stroke-width="4" fill="none"/>
-  <text x="60" y="115" text-anchor="middle" font-size="18" fill="#fff" font-weight="bold">🌙</text>
+  <!-- 顔 -->
+  <ellipse cx="60" cy="65" rx="26" ry="28" fill="#f8f7ff" stroke="#a855f7" stroke-width="2"/>
+  <!-- 目 -->
+  <ellipse cx="52" cy="70" rx="3" ry="3.5" fill="#333"/>
+  <ellipse cx="68" cy="70" rx="3" ry="3.5" fill="#333"/>
+  <!-- 口（おだやか） -->
+  <path d="M54 78 Q60 80 66 78" stroke="#a855f7" stroke-width="2" fill="none"/>
+  <!-- 髪（月モチーフ） -->
+  <path d="M60 45 Q70 35 80 55 Q90 65 70 70 Q80 80 60 75 Q40 80 50 70 Q30 65 40 55 Q50 35 60 45 Z" fill="#ede9fe" stroke="#a855f7" stroke-width="1.5"/>
+  <!-- 星アイコン -->
+  <polygon points="60,100 62,106 68,106 63,110 65,116 60,112 55,116 57,110 52,106 58,106" fill="#fde68a" stroke="#a855f7" stroke-width="1"/>
+  <!-- 月アイコン -->
+  <path d="M80 110 Q90 100 80 90 Q95 95 80 110 Z" fill="#fde68a" stroke="#a855f7" stroke-width="1"/>
+  <text x="60" y="112" text-anchor="middle" font-size="18" fill="#a855f7" font-weight="bold">🌙</text>
 </svg> 

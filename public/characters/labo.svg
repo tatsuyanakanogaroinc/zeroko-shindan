@@ -1,7 +1,20 @@
 <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="60" cy="60" r="55" fill="#22c55e" stroke="#fff" stroke-width="6"/>
-  <rect x="50" y="50" width="20" height="30" rx="10" fill="#fff"/>
-  <circle cx="60" cy="65" r="8" fill="#22c55e"/>
-  <rect x="57" y="80" width="6" height="15" rx="3" fill="#fff"/>
-  <text x="60" y="115" text-anchor="middle" font-size="18" fill="#fff" font-weight="bold">🔬</text>
+  <!-- 顔 -->
+  <ellipse cx="60" cy="65" rx="26" ry="28" fill="#f7fff7" stroke="#22c55e" stroke-width="2"/>
+  <!-- 目 -->
+  <ellipse cx="52" cy="70" rx="3" ry="3.5" fill="#333"/>
+  <ellipse cx="68" cy="70" rx="3" ry="3.5" fill="#333"/>
+  <!-- メガネ -->
+  <ellipse cx="52" cy="70" rx="6" ry="6" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <ellipse cx="68" cy="70" rx="6" ry="6" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <rect x="58" y="70" width="4" height="2" fill="#22c55e"/>
+  <!-- 口（やさしい笑顔） -->
+  <path d="M54 78 Q60 84 66 78" stroke="#22c55e" stroke-width="2" fill="none"/>
+  <!-- 白衣 -->
+  <rect x="44" y="90" width="32" height="18" rx="8" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+  <!-- 試験管アイコン -->
+  <rect x="80" y="100" width="6" height="14" rx="3" fill="#fff" stroke="#22c55e" stroke-width="1.5"/>
+  <circle cx="83" cy="100" r="3" fill="#22c55e"/>
+  <text x="60" y="112" text-anchor="middle" font-size="18" fill="#22c55e" font-weight="bold">🔬</text>
 </svg> 

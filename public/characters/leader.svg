@@ -1,7 +1,14 @@
 <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="60" cy="60" r="55" fill="#f04dff" stroke="#fff" stroke-width="6"/>
-  <rect x="45" y="40" width="30" height="40" rx="15" fill="#fff"/>
-  <circle cx="60" cy="60" r="12" fill="#f04dff"/>
-  <rect x="55" y="80" width="10" height="20" rx="5" fill="#fff"/>
-  <text x="60" y="115" text-anchor="middle" font-size="18" fill="#fff" font-weight="bold">🔥</text>
+  <!-- 顔 -->
+  <ellipse cx="60" cy="60" rx="28" ry="32" fill="#fff8f0" stroke="#f04dff" stroke-width="2"/>
+  <!-- 目 -->
+  <ellipse cx="52" cy="65" rx="3" ry="4" fill="#333"/>
+  <ellipse cx="68" cy="65" rx="3" ry="4" fill="#333"/>
+  <!-- 口（にっこり） -->
+  <path d="M54 75 Q60 82 66 75" stroke="#f04dff" stroke-width="2" fill="none"/>
+  <!-- 髪（炎モチーフ） -->
+  <path d="M60 35 Q55 25 65 28 Q70 18 75 32 Q80 25 80 40 Q90 38 80 50 Q85 55 75 55 Q70 60 60 50 Q50 60 45 55 Q35 55 40 50 Q30 38 40 40 Q40 25 45 32 Q50 18 55 28 Q65 25 60 35 Z" fill="#ff7b00" stroke="#f04dff" stroke-width="1.5"/>
+  <!-- 炎アイコン -->
+  <text x="60" y="110" text-anchor="middle" font-size="22" fill="#ff7b00" font-weight="bold">🔥</text>
 </svg> 
