@@ -107,10 +107,10 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
 
   // キャラクター画像マップ
   const characterMap: Record<string, { label: string; img: string }> = {
-    '自発型': { label: '🔥リーダーくん', img: '/characters/leader.svg' },
-    '転機型': { label: '🌊チェンジさん', img: '/characters/change.svg' },
-    '探求型': { label: '🔬ラボ少年', img: '/characters/labo.svg' },
-    '内省型': { label: '🌙ムーンちゃん', img: '/characters/moon.svg' },
+    '自発型': { label: '🔥リーダーくん', img: '/characters/leader.png' },
+    '転機型': { label: '🌊チェンジさん', img: '/characters/change.png' },
+    '探求型': { label: '🔬ラボ少年', img: '/characters/labo.png' },
+    '内省型': { label: '🌙ムーンちゃん', img: '/characters/moon.png' },
   };
 
   return (

@@ -64,7 +64,7 @@ const StartComponent: React.FC<StartComponentProps> = ({ onStart }) => {
           </div>
           <div className="flex flex-col items-center justify-center">
             <div className="rounded-xl shadow-md p-6 bg-white/90" style={{ maxWidth: 320, width: '100%' }}>
-              <img src="/characters/leader.svg" alt="リーダーくん" style={{ width: 80, height: 80, objectFit: 'contain', margin: '0 auto 0.5rem' }} />
+              <img src="/characters/leader.png" alt="リーダーくん" style={{ width: 80, height: 80, objectFit: 'contain', margin: '0 auto 0.5rem' }} />
               <div style={{ fontSize: '1.3rem', fontWeight: 'bold', marginBottom: '0.3rem' }}>🔥リーダーくん（自発型）</div>
               <div style={{ fontSize: '1.1rem', color: '#4B5563', marginBottom: '0.2rem' }}>挑戦の旗を掲げるリーダータイプ</div>
               <div style={{ fontSize: '0.98rem', color: '#6B7280' }}>
