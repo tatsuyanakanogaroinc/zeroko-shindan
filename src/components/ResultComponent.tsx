@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { QuizResult, QuizScores, GrowthType } from '../types/quiz';
 import { submitQuizResult, getOrCreateAnonymousId, QuizSubmissionData } from '../utils/api';
-import { getCharacterByType, Character } from '../data/characterData';
+import { getCharacterByType } from '../data/characterData';
+import type { Character } from '../data/characterData';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -208,17 +209,11 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
             </p>
           </div>
 
-          {/* キャラクターの特徴表示 */}
+          {/* タイプの特徴表示 */}
           <div className="flex flex-wrap justify-center gap-2 mb-4">
-            {resultCharacters.flatMap(char => char.keywords.slice(0, 2)).map((keyword, index) => (
-              <span 
-                key={index}
-                className="px-3 py-1 rounded-full text-sm font-medium text-white"
-                style={{ backgroundColor: resultCharacters[0].color + 'cc' }}
-              >
-                #{keyword}
-              </span>
-            ))}
+            <span className="px-3 py-1 rounded-full text-sm font-medium text-white bg-purple-500">
+              #{result.type}
+            </span>
           </div>
 
           {/* キャッチフレーズ */}
@@ -244,45 +239,14 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
           <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <div className="flex items-center justify-center mb-4">
               <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                <span className="mr-2">{resultCharacters[0].emoji}</span>
-                {resultCharacters[0].name}の特徴
+                <span className="mr-2">{resultCharacters[0]?.emoji || '🌟'}</span>
+                {result.type}タイプの特徴
               </h3>
             </div>
             
-            <div className="grid grid-cols-2 gap-6 mb-4">
-              <div>
-                <h4 className="text-sm font-semibold text-gray-600 mb-2">🌟 性格</h4>
-                <div className="flex flex-wrap gap-2">
-                  {resultCharacters[0].personality.map((trait, index) => (
-                    <span 
-                      key={index}
-                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                    >
-                      {trait}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="text-sm font-semibold text-gray-600 mb-2">💪 強み</h4>
-                <div className="flex flex-wrap gap-2">
-                  {resultCharacters[0].strengths.map((strength, index) => (
-                    <span 
-                      key={index}
-                      className="px-2 py-1 text-white rounded-full text-xs"
-                      style={{ backgroundColor: resultCharacters[0].color + 'cc' }}
-                    >
-                      {strength}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
             <div className="text-center">
-              <p className="text-sm text-gray-600 italic">
-                好きな活動: {resultCharacters[0].favoriteActivities.join(' • ')}
+              <p className="text-lg text-gray-700 font-medium">
+                {result.body}
               </p>
             </div>
           </div>
@@ -348,14 +312,10 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
             <h4 className="text-lg text-gray-800 mb-3 text-center" style={{ fontWeight: '600' }}>
               🌱 成長のヒント
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {resultCharacters[0].growthTips.map((tip, index) => (
-                <div key={index} className="text-center">
-                  <div className="bg-white rounded-lg p-3 shadow-sm">
-                    <p className="text-sm text-gray-700">{tip}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="text-center">
+              <p className="text-gray-700">
+                あなたの{result.type}としての特性を活かして、自分らしい成長を続けていきましょう！
+              </p>
             </div>
           </div>
         </div>

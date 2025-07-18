@@ -1,6 +1,5 @@
 import { QuizQuestion, QuizResult } from '../types/quiz';
 import { getCharacterByType } from './characterData';
-import { getCharacterByType } from './characterData';
 
 export const quizQuestions: QuizQuestion[] = [
   {

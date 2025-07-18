@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { getAllCharacters, Character } from '../data/characterData';
 
 interface StartComponentProps {
   onStart: () => void;
 }
 
 const StartComponent: React.FC<StartComponentProps> = ({ onStart }) => {
-  const [currentCharacter, setCurrentCharacter] = useState(0);
+  const [currentType, setCurrentType] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const characters = getAllCharacters();
+  
+  const types = [
+    { name: '自発型', emoji: '🔥', color: '#f04dff' },
+    { name: '転機型', emoji: '🌊', color: '#0ea5e9' },
+    { name: '探求型', emoji: '🔍', color: '#22c55e' },
+    { name: '内省型', emoji: '🌙', color: '#a855f7' }
+  ];
 
   useEffect(() => {
     setIsVisible(true);
     const interval = setInterval(() => {
-      setCurrentCharacter((prev) => (prev + 1) % characters.length);
+      setCurrentType((prev) => (prev + 1) % types.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [characters.length]);
+  }, [types.length]);
 
   return (
     <div className="flex items-center justify-center bg-gradient-to-br from-indigo-200 via-purple-100 to-pink-100" style={{ minHeight: '100vh', padding: '1rem' }}>
@@ -56,70 +61,36 @@ const StartComponent: React.FC<StartComponentProps> = ({ onStart }) => {
           </p>
         </div>
 
-        {/* キャラクター紹介部分 */}
+        {/* タイプ紹介部分 */}
         <div className="mb-8">
           <div 
             className="rounded-3xl p-6 shadow-lg border-2 transition-all duration-500"
             style={{ 
-              background: `linear-gradient(135deg, ${characters[currentCharacter].color}15, ${characters[currentCharacter].color}08)`,
-              borderColor: characters[currentCharacter].color + '40'
+              background: `linear-gradient(135deg, ${types[currentType].color}15, ${types[currentType].color}08)`,
+              borderColor: types[currentType].color + '40'
             }}
           >
             <div className="flex justify-center mb-4">
               <div className="relative">
                 <div 
-                  className="w-24 h-24 rounded-full flex items-center justify-center shadow-lg animate-float"
+                  className="w-24 h-24 rounded-full flex items-center justify-center shadow-lg animate-float text-4xl"
                   style={{ 
-                    background: `linear-gradient(135deg, ${characters[currentCharacter].color}dd, ${characters[currentCharacter].color}aa)`,
+                    background: `linear-gradient(135deg, ${types[currentType].color}dd, ${types[currentType].color}aa)`,
                   }}
                 >
-                  <img 
-                    src={characters[currentCharacter].image} 
-                    alt={characters[currentCharacter].name}
-                    className="w-16 h-16 transition-all duration-500 hover:scale-110"
-                    style={{ 
-                      filter: 'brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-                    }} 
-                  />
-                </div>
-                <div 
-                  className="absolute -top-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-lg animate-bounce"
-                  style={{ backgroundColor: characters[currentCharacter].color }}
-                >
-                  {characters[currentCharacter].emoji}
+                  {types[currentType].emoji}
                 </div>
               </div>
             </div>
             
             <div className="text-center space-y-2">
-              <div className="flex items-center justify-center space-x-2">
-                <h3 className="text-xl font-bold" style={{ color: characters[currentCharacter].color }}>
-                  {characters[currentCharacter].name}
-                </h3>
-                <span className="text-sm px-2 py-1 rounded-full text-white font-medium" style={{ backgroundColor: characters[currentCharacter].color }}>
-                  {characters[currentCharacter].nickname}
-                </span>
-              </div>
+              <h3 className="text-xl font-bold" style={{ color: types[currentType].color }}>
+                {types[currentType].name}
+              </h3>
               
-              <p className="text-sm font-medium text-gray-700">
-                {characters[currentCharacter].personality.join(' • ')}
+              <p className="text-sm text-gray-600">
+                あなたはどのタイプでしょうか？
               </p>
-              
-              <p className="text-sm text-gray-600 italic">
-                {characters[currentCharacter].catchphrase}
-              </p>
-              
-              <div className="flex flex-wrap justify-center gap-2 mt-3">
-                {characters[currentCharacter].strengths.slice(0, 3).map((strength: string, index: number) => (
-                  <span 
-                    key={index}
-                    className="text-xs px-2 py-1 rounded-full text-white"
-                    style={{ backgroundColor: characters[currentCharacter].color + 'aa' }}
-                  >
-                    {strength}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -171,28 +142,25 @@ const StartComponent: React.FC<StartComponentProps> = ({ onStart }) => {
         <div className="mb-8">
           <h3 className="text-lg font-bold text-gray-800 mb-4">🌟 4つの成長タイプ</h3>
           <div className="grid grid-cols-2 gap-3">
-            {characters.map((char: Character, index: number) => (
+            {types.map((type, index: number) => (
               <div 
-                key={char.id}
+                key={type.name}
                 className={`p-3 rounded-xl transition-all duration-300 cursor-pointer hover:scale-105 ${
-                  currentCharacter === index ? 'shadow-lg' : 'shadow-sm'
+                  currentType === index ? 'shadow-lg' : 'shadow-sm'
                 }`}
                 style={{ 
-                  background: currentCharacter === index 
-                    ? `linear-gradient(135deg, ${char.color}20, ${char.color}10)` 
+                  background: currentType === index 
+                    ? `linear-gradient(135deg, ${type.color}20, ${type.color}10)` 
                     : 'rgba(255,255,255,0.7)',
-                  border: currentCharacter === index ? `2px solid ${char.color}` : '1px solid rgba(0,0,0,0.1)'
+                  border: currentType === index ? `2px solid ${type.color}` : '1px solid rgba(0,0,0,0.1)'
                 }}
-                onClick={() => setCurrentCharacter(index)}
+                onClick={() => setCurrentType(index)}
               >
                 <div className="flex items-center justify-center mb-2">
-                  <span className="text-lg">{char.emoji}</span>
+                  <span className="text-lg">{type.emoji}</span>
                 </div>
-                <div className="text-xs font-bold mb-1" style={{ color: char.color }}>
-                  {char.name}
-                </div>
-                <div className="text-xs text-gray-600">
-                  {char.type}
+                <div className="text-xs font-bold" style={{ color: type.color }}>
+                  {type.name}
                 </div>
               </div>
             ))}
@@ -238,17 +206,15 @@ const StartComponent: React.FC<StartComponentProps> = ({ onStart }) => {
           
           <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-lg border border-gray-100">
             <div className="flex items-center justify-center mb-4">
-              <img 
-                src={characters[currentCharacter].image} 
-                alt={characters[currentCharacter].name}
-                className="w-16 h-16 mr-4"
-              />
+              <div className="text-4xl mr-4">
+                {types[currentType].emoji}
+              </div>
               <div className="text-left">
-                <div className="text-lg font-bold" style={{ color: characters[currentCharacter].color }}>
-                  {characters[currentCharacter].name}
+                <div className="text-lg font-bold" style={{ color: types[currentType].color }}>
+                  {types[currentType].name}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {characters[currentCharacter].type}タイプ
+                  成長タイプ診断
                 </div>
               </div>
             </div>
