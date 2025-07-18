@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { QuizResult, QuizScores } from '../types/quiz';
+import { QuizResult, QuizScores, GrowthType } from '../types/quiz';
 import { submitQuizResult, getOrCreateAnonymousId, QuizSubmissionData } from '../utils/api';
+import { getCharacterByType, Character } from '../data/characterData';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -21,17 +22,10 @@ ChartJS.register(
   Legend
 );
 
-const typeIcons: Record<string, string> = {
-  '自発型': '/icons/rocket.svg',
-  '転機型': '/icons/handshake.svg',
-  '探求型': '/icons/search.svg',
-  '内省型': '/icons/heart.svg',
-};
-
-function getResultIcons(type: string) {
+function getResultCharacters(type: string): Character[] {
   // ミックスタイプは「・」区切り
-  const types = type.split('・');
-  return types.map((t) => typeIcons[t] || typeIcons['自発型']);
+  const types = type.split('・') as GrowthType[];
+  return types.map((t) => getCharacterByType(t));
 }
 
 interface ResultComponentProps {
@@ -116,8 +110,8 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
     }
   };
 
-  // アイコン取得
-  const icons = getResultIcons(result.type);
+  // キャラクター取得
+  const resultCharacters = getResultCharacters(result.type);
 
   // 診断結果を送信する関数
   const handleSubmitResult = async () => {
@@ -158,25 +152,81 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
       <div className="quiz-card" style={{ maxWidth: '800px', width: '100%' }}>
         {/* 結果タイトル */}
         <div className="text-center mb-8">
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
-            {icons.map((icon, idx) => (
-              <img
-                key={icon + idx}
-                src={icon}
-                alt="タイプアイコン"
-                style={{ width: 64, height: 64, objectFit: 'contain', background: '#f9fafb', borderRadius: 16, border: '1px solid #eee', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-              />
+          <div className="flex justify-center gap-4 mb-6">
+            {resultCharacters.map((character, idx) => (
+              <div 
+                key={character.id}
+                className="relative animate-float"
+                style={{ animationDelay: `${idx * 0.2}s` }}
+              >
+                <div 
+                  className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${character.color}dd, ${character.color}aa)`,
+                  }}
+                >
+                  <img
+                    src={character.image}
+                    alt={character.name}
+                    className="w-14 h-14"
+                    style={{ 
+                      filter: 'brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                    }}
+                  />
+                </div>
+                <div 
+                  className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-sm animate-bounce"
+                  style={{ backgroundColor: character.color }}
+                >
+                  {character.emoji}
+                </div>
+                <div className="mt-2 text-center">
+                  <div className="text-sm font-bold" style={{ color: character.color }}>
+                    {character.name}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    {character.nickname}
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
-          <h1 className="text-3xl gradient-text mb-4">
-            🎉 診断結果
+          
+          <h1 className="text-4xl gradient-text mb-4 font-extrabold">
+            🎉 診断結果発表！
           </h1>
-          <h2 className="text-2xl text-gray-800 mb-2" style={{ fontWeight: '700' }}>
-            {result.title}
-          </h2>
-          <p className="text-lg text-gray-600">
-            {result.body}
-          </p>
+          
+          <div className="mb-4">
+            <h2 className="text-3xl font-bold mb-2" style={{ 
+              color: resultCharacters[0].color,
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              {result.title}
+            </h2>
+            <p className="text-lg text-gray-700 font-medium">
+              {result.body}
+            </p>
+          </div>
+
+          {/* キャラクターの特徴表示 */}
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {resultCharacters.flatMap(char => char.keywords.slice(0, 2)).map((keyword, index) => (
+              <span 
+                key={index}
+                className="px-3 py-1 rounded-full text-sm font-medium text-white"
+                style={{ backgroundColor: resultCharacters[0].color + 'cc' }}
+              >
+                #{keyword}
+              </span>
+            ))}
+          </div>
+
+          {/* キャッチフレーズ */}
+          <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-4 shadow-inner">
+            <p className="text-lg font-medium text-gray-700 italic">
+              {resultCharacters[0].catchphrase}
+            </p>
+          </div>
         </div>
 
         {/* スコアグラフ */}
@@ -189,8 +239,57 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
           </div>
         </div>
 
+        {/* キャラクター詳細情報 */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="flex items-center justify-center mb-4">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                <span className="mr-2">{resultCharacters[0].emoji}</span>
+                {resultCharacters[0].name}の特徴
+              </h3>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6 mb-4">
+              <div>
+                <h4 className="text-sm font-semibold text-gray-600 mb-2">🌟 性格</h4>
+                <div className="flex flex-wrap gap-2">
+                  {resultCharacters[0].personality.map((trait, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                    >
+                      {trait}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-semibold text-gray-600 mb-2">💪 強み</h4>
+                <div className="flex flex-wrap gap-2">
+                  {resultCharacters[0].strengths.map((strength, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 text-white rounded-full text-xs"
+                      style={{ backgroundColor: resultCharacters[0].color + 'cc' }}
+                    >
+                      {strength}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-gray-600 italic">
+                好きな活動: {resultCharacters[0].favoriteActivities.join(' • ')}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* 詳細説明 */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="space-y-4">
             <div className="bg-gradient-primary rounded-xl p-6">
               <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
@@ -221,16 +320,43 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answe
               </p>
             </div>
 
-            {result.experienceTips && (
-              <div className="bg-gradient-yellow rounded-xl p-6">
-                <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
-                  🌟 インターンでのヒント
-                </h4>
-                <p className="text-gray-700" style={{ lineHeight: '1.6' }}>
-                  {result.experienceTips}
-                </p>
+            {/* 適職情報 */}
+            <div className="bg-gradient-yellow rounded-xl p-6">
+              <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
+                💼 向いている職業
+              </h4>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {(result as any).jobs?.map((job: string, index: number) => (
+                  <span 
+                    key={index}
+                    className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm font-medium"
+                  >
+                    {job}
+                  </span>
+                ))}
               </div>
-            )}
+              <p className="text-gray-700 text-sm" style={{ lineHeight: '1.6' }}>
+                {(result as any).jobsDetail}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 成長のヒント */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+            <h4 className="text-lg text-gray-800 mb-3 text-center" style={{ fontWeight: '600' }}>
+              🌱 成長のヒント
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {resultCharacters[0].growthTips.map((tip, index) => (
+                <div key={index} className="text-center">
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <p className="text-sm text-gray-700">{tip}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
