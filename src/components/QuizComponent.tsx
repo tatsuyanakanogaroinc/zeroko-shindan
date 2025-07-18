@@ -53,36 +53,45 @@ const QuizComponent: React.FC<QuizComponentProps> = ({
           {question.options.map((option, index) => (
             <div
               key={index}
-              className={`option-card ${
-                selectedOption === index ? 'selected' : ''
-              }`}
+              className={`option-card ${selectedOption === index ? 'selected' : ''}`}
               onClick={() => onAnswerSelect(index)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 48,
+                padding: '0.75rem 1rem',
+                gap: '0.75rem',
+                cursor: 'pointer',
+                wordBreak: 'break-word',
+              }}
             >
-              <div className="flex items-start space-x-3">
-                <div style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  border: `2px solid ${selectedOption === index ? '#f04dff' : '#d1d5db'}`,
-                  backgroundColor: selectedOption === index ? '#f04dff' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: '2px'
-                }}>
-                  {selectedOption === index && (
-                    <div style={{
-                      width: '8px',
-                      height: '8px',
-                      backgroundColor: 'white',
-                      borderRadius: '50%'
-                    }}></div>
-                  )}
-                </div>
-                <span className="text-gray-700" style={{ lineHeight: '1.5' }}>
-                  {option.text}
-                </span>
+              <div style={{
+                minWidth: 28,
+                minHeight: 28,
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                border: `2px solid ${selectedOption === index ? '#f04dff' : '#d1d5db'}`,
+                backgroundColor: selectedOption === index ? '#f04dff' : 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 12,
+                flexShrink: 0,
+                transition: 'border 0.2s, background 0.2s',
+              }}>
+                {selectedOption === index && (
+                  <div style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: 'white',
+                    borderRadius: '50%',
+                  }}></div>
+                )}
               </div>
+              <span className="text-gray-700" style={{ lineHeight: '1.5', flex: 1, fontSize: 16, wordBreak: 'break-word' }}>
+                {option.text}
+              </span>
             </div>
           ))}
         </div>
@@ -92,11 +101,7 @@ const QuizComponent: React.FC<QuizComponentProps> = ({
           <button
             onClick={onNext}
             disabled={selectedOption === undefined}
-            className={`btn-primary ${
-              selectedOption === undefined 
-                ? 'opacity-50 cursor-not-allowed' 
-                : ''
-            }`}
+            className={`btn-primary ${selectedOption === undefined ? 'opacity-50 cursor-not-allowed' : ''}`}
             style={{
               transform: selectedOption === undefined ? 'none' : 'translateY(0)'
             }}

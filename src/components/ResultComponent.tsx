@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { QuizResult, QuizScores } from '../types/quiz';
+import { submitQuizResult, getOrCreateAnonymousId, QuizSubmissionData } from '../utils/api';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,7 +11,6 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import { quizResults } from '../data/quizData';
 
 ChartJS.register(
   CategoryScale,
@@ -21,13 +21,32 @@ ChartJS.register(
   Legend
 );
 
+const typeIcons: Record<string, string> = {
+  '自発型': '/icons/rocket.svg',
+  '転機型': '/icons/handshake.svg',
+  '探求型': '/icons/search.svg',
+  '内省型': '/icons/heart.svg',
+};
+
+function getResultIcons(type: string) {
+  // ミックスタイプは「・」区切り
+  const types = type.split('・');
+  return types.map((t) => typeIcons[t] || typeIcons['自発型']);
+}
+
 interface ResultComponentProps {
   result: QuizResult;
   scores: QuizScores;
+  answers: { questionId: number; selectedOption: number }[];
+  nickname: string;
   onRestart: () => void;
 }
 
-const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRestart }) => {
+const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, answers, nickname, onRestart }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitMessage, setSubmitMessage] = useState('');
+
   const chartData = {
     labels: ['自発型', '転機型', '探求型', '内省型'],
     datasets: [
@@ -97,20 +116,41 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
     }
   };
 
-  // 一番スコアが高いタイプを取得
-  const maxType = Object.entries(scores).reduce((a, b) => (a[1] >= b[1] ? a : b))[0] as keyof typeof scores;
+  // アイコン取得
+  const icons = getResultIcons(result.type);
 
-  // displayNameとjobsをquizResultsから取得
-  const displayName = quizResults[maxType]?.displayName || maxType;
-  const jobs = quizResults[maxType]?.jobs || [];
-  const jobsDetail = quizResults[maxType]?.jobsDetail || '';
+  // 診断結果を送信する関数
+  const handleSubmitResult = async () => {
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setSubmitMessage('');
 
-  // キャラクター画像マップ
-  const characterMap: Record<string, { label: string; img: string }> = {
-    '自発型': { label: '🔥リーダーくん', img: '/characters/leader.svg' },
-    '転機型': { label: '🌊応援サポーター', img: '/characters/change.svg' },
-    '探求型': { label: '🔬研究マスター', img: '/characters/labo.svg' },
-    '内省型': { label: '🌙ムードメーカー', img: '/characters/moon.svg' },
+    try {
+      const userId = getOrCreateAnonymousId();
+      
+      const submissionData: QuizSubmissionData = {
+        nickname,
+        userId,
+        result,
+        scores,
+        answers
+      };
+
+      const response = await submitQuizResult(submissionData);
+      
+      if (response.success) {
+        setSubmitStatus('success');
+        setSubmitMessage('診断結果が記録されました！');
+      } else {
+        setSubmitStatus('error');
+        setSubmitMessage(response.error || '送信に失敗しました');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      setSubmitMessage('送信に失敗しました');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,6 +158,16 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
       <div className="quiz-card" style={{ maxWidth: '800px', width: '100%' }}>
         {/* 結果タイトル */}
         <div className="text-center mb-8">
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
+            {icons.map((icon, idx) => (
+              <img
+                key={icon + idx}
+                src={icon}
+                alt="タイプアイコン"
+                style={{ width: 64, height: 64, objectFit: 'contain', background: '#f9fafb', borderRadius: 16, border: '1px solid #eee', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+              />
+            ))}
+          </div>
           <h1 className="text-3xl gradient-text mb-4">
             🎉 診断結果
           </h1>
@@ -139,46 +189,10 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
           </div>
         </div>
 
-        {/* 一番多いタイプのキャラクターと説明 */}
-        <div className="mb-8 text-center">
-          <div style={{ marginBottom: '0.5rem' }}>
-            <img
-              src={characterMap[maxType].img}
-              alt={characterMap[maxType].label}
-              style={{ width: '120px', height: '120px', objectFit: 'contain', margin: '0 auto' }}
-            />
-          </div>
-          <div style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-            {characterMap[maxType].label}（{displayName}）
-          </div>
-          <div style={{ fontSize: '1.3rem', fontWeight: '600', marginBottom: '0.5rem', color: '#4B5563' }}>
-            {quizResults[maxType]?.title || result.title}
-          </div>
-          <div style={{ fontSize: '1.1rem', color: '#6B7280', marginBottom: '0.5rem' }}>
-            {quizResults[maxType]?.body || result.body}
-          </div>
-        </div>
-
-        {/* 4つのカードを2列グリッドで綺麗に並べる */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* おすすめの職業 */}
-          <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl p-6 border border-indigo-200 shadow-md flex flex-col justify-between h-full">
-            <div>
-              <div style={{ fontWeight: '600', color: '#667eea', fontSize: '1.1rem', marginBottom: '0.3rem' }}>
-                💼 おすすめの職業
-              </div>
-              <div style={{ color: '#374151', fontSize: '1rem', marginBottom: '0.5rem' }}>
-                {jobs.length > 0 ? jobs.join(' / ') : '（該当なし）'}
-              </div>
-              <div style={{ color: '#6B7280', fontSize: '0.98rem', lineHeight: 1.7 }}>
-                {jobsDetail}
-              </div>
-            </div>
-          </div>
-
-          {/* 詳細解説 */}
-          <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl p-6 border border-indigo-200 shadow-md flex flex-col justify-between h-full">
-            <div>
+        {/* 詳細説明 */}
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="space-y-4">
+            <div className="bg-gradient-primary rounded-xl p-6">
               <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
                 💭 詳細解説
               </h4>
@@ -186,13 +200,10 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
                 {result.detail}
               </p>
             </div>
-          </div>
 
-          {/* ゼロ高での活用方法 */}
-          <div className="bg-gradient-to-r from-green-50 via-teal-50 to-lime-50 rounded-xl p-6 border border-green-200 shadow-md flex flex-col justify-between h-full">
-            <div>
+            <div className="bg-gradient-green rounded-xl p-6">
               <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
-                🎯 ゼロ高での活用方法
+                🎯 活用方法
               </h4>
               <p className="text-gray-700" style={{ lineHeight: '1.6' }}>
                 {result.usage}
@@ -200,9 +211,8 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
             </div>
           </div>
 
-          {/* あなたへのメッセージ */}
-          <div className="bg-gradient-to-r from-purple-50 via-pink-50 to-yellow-50 rounded-xl p-6 border border-purple-200 shadow-md flex flex-col justify-between h-full">
-            <div>
+          <div className="space-y-4">
+            <div className="bg-gradient-purple rounded-xl p-6">
               <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
                 💌 あなたへのメッセージ
               </h4>
@@ -210,9 +220,10 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
                 {result.student}
               </p>
             </div>
+
             {result.experienceTips && (
-              <div className="mt-4 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4 border border-yellow-200">
-                <h4 className="text-base text-gray-800 mb-2" style={{ fontWeight: '600' }}>
+              <div className="bg-gradient-yellow rounded-xl p-6">
+                <h4 className="text-lg text-gray-800 mb-3" style={{ fontWeight: '600' }}>
                   🌟 インターンでのヒント
                 </h4>
                 <p className="text-gray-700" style={{ lineHeight: '1.6' }}>
@@ -223,11 +234,38 @@ const ResultComponent: React.FC<ResultComponentProps> = ({ result, scores, onRes
           </div>
         </div>
 
+        {/* 送信状態表示 */}
+        {submitStatus !== 'idle' && (
+          <div className="mb-6 p-4 rounded-lg text-center" style={{
+            backgroundColor: submitStatus === 'success' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+            border: `1px solid ${submitStatus === 'success' ? '#22c55e' : '#ef4444'}`
+          }}>
+            <p style={{
+              color: submitStatus === 'success' ? '#22c55e' : '#ef4444',
+              fontWeight: '600'
+            }}>
+              {submitMessage}
+            </p>
+          </div>
+        )}
+
         {/* アクションボタン */}
         <div className="flex flex-col gap-4 justify-center" style={{ gap: '1rem' }}>
           <button
-            onClick={onRestart}
+            onClick={handleSubmitResult}
+            disabled={isSubmitting}
             className="btn-primary"
+            style={{
+              opacity: isSubmitting ? 0.7 : 1,
+              cursor: isSubmitting ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {isSubmitting ? '📤 送信中...' : '📊 結果を記録する'}
+          </button>
+          
+          <button
+            onClick={onRestart}
+            className="btn-secondary"
           >
             🔄 もう一度診断する
           </button>

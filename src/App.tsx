@@ -5,8 +5,9 @@ import { calculateScores, determineResult, getResultData } from './utils/quizLog
 import QuizComponent from './components/QuizComponent';
 import ResultComponent from './components/ResultComponent';
 import StartComponent from './components/StartComponent';
+import NicknameComponent from './components/NicknameComponent';
 
-type QuizState = 'start' | 'quiz' | 'result';
+type QuizState = 'start' | 'quiz' | 'nickname' | 'result';
 
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
@@ -24,6 +25,7 @@ function App() {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [scores, setScores] = useState<QuizScores | null>(null);
   const [shuffledQuestions, setShuffledQuestions] = useState<QuizQuestion[]>([]);
+  const [nickname, setNickname] = useState('');
 
   const handleStartQuiz = () => {
     // 質問と選択肢をシャッフル
@@ -57,14 +59,20 @@ function App() {
     if (currentQuestion < shuffledQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // 診断完了
-      const finalScores = calculateScores(answers, shuffledQuestions);
-      const resultType = determineResult(finalScores);
-      const resultData = getResultData(resultType);
-      setScores(finalScores);
-      setResult(resultData);
-      setCurrentState('result');
+      // 質問終了後、ニックネーム入力画面へ
+      setCurrentState('nickname');
     }
+  };
+
+  const handleNicknameSubmit = (name: string) => {
+    setNickname(name);
+    // 診断ロジックをここで実行
+    const finalScores = calculateScores(answers, shuffledQuestions);
+    const resultType = determineResult(finalScores);
+    const resultData = getResultData(resultType);
+    setScores(finalScores);
+    setResult(resultData);
+    setCurrentState('result');
   };
 
   const handleRestart = () => {
@@ -95,10 +103,17 @@ function App() {
             onNext={handleNextQuestion}
           />
         )}
+        {currentState === 'nickname' && (
+          <NicknameComponent
+            onSubmit={handleNicknameSubmit}
+          />
+        )}
         {currentState === 'result' && result && scores && (
           <ResultComponent
             result={result}
             scores={scores}
+            answers={answers}
+            nickname={nickname}
             onRestart={handleRestart}
           />
         )}
